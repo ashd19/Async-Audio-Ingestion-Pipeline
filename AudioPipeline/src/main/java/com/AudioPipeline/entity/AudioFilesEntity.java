@@ -1,4 +1,4 @@
-package com.AudioPipeline.AudioPipeline.entity;
+package com.AudioPipeline.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
