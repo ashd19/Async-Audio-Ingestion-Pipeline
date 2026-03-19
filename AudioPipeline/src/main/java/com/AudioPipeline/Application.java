@@ -1,4 +1,4 @@
-package com.AudioPipeline.AudioPipeline;
+package com.AudioPipeline;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
