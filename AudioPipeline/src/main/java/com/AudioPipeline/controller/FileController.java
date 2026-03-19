@@ -1,22 +1,25 @@
 package com.AudioPipeline.controller;
 
 import com.AudioPipeline.dto.AudioFileDto;
+import com.AudioPipeline.service.AudioFileService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api")
 public class FileController {
-    private AudioFileDto audioFileDto;
+    private final AudioFileService audioFileService;
 
-//    @PostMapping("/upload")
-//    public ResponseEntity<AudioFileDto> uploadFile(@RequestBody AudioFileDto audioFileDto) {
-//        // save a json string to db ...
-//    }
+    public FileController(AudioFileService audioFileService) {
+        this.audioFileService = audioFileService;
+    }
 
-    @GetMapping("/upload")
-    public String upload(){
-        return "upload";
+    @PostMapping("/upload")
+    public ResponseEntity<AudioFileDto> uploadFile(@Valid @RequestBody AudioFileDto audioFileDto,
+                                                   HttpServletRequest request) {
+        AudioFileDto saved = audioFileService.addFilePath(audioFileDto, request.getRemoteAddr());
+        return ResponseEntity.ok(saved);
     }
 }

@@ -1,22 +1,28 @@
 package com.AudioPipeline.service;
 
 import com.AudioPipeline.dto.AudioFileDto;
-import com.AudioPipeline.repository.AudioFileRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import com.AudioPipeline.AudioPipeline.entity.AudioFilesEntity;
+import com.AudioPipeline.repository.AudioFileRepository;
+import org.springframework.stereotype.Service;
 
 @Service
 public class AudioFileService {
 
-    @Autowired
-    private AudioFileRepository audioFileRepository;
+    private final AudioFileRepository audioFileRepository;
 
-    // save the string to db , now here entity class or dto class
-    public void addFilePath(AudioFileDto audioFileDto){
+    public AudioFileService(AudioFileRepository audioFileRepository) {
+        this.audioFileRepository = audioFileRepository;
+    }
+
+    public AudioFileDto addFilePath(AudioFileDto audioFileDto, String ipAddress) {
         AudioFilesEntity audioFilesEntity = new AudioFilesEntity();
+        audioFilesEntity.setIpAddress(ipAddress);
         audioFilesEntity.setFilePath(audioFileDto.getFilePath());
-        audioFileRepository.save(audioFilesEntity);
+        AudioFilesEntity savedEntity = audioFileRepository.save(audioFilesEntity);
+
+        return AudioFileDto.builder()
+                .filePath(savedEntity.getFilePath())
+                .build();
     }
 
 }
