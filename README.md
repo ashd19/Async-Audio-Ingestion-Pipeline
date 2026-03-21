@@ -19,6 +19,15 @@ This pipeline separates responsibilities so the system can scale, recover from f
 - **Object Storage:** MinIO (Docker)  
 - **Load Testing:** Apache JMeter
 
+## 🧪 Test Setup
+
+- **Threads (users):** 50  
+- **Ramp-up period:** 10 seconds  
+- **Loop count:** 10  
+- **Audio file size:** ~5MB
+
+
+
 <!--
 ## Architecture Summary
 
