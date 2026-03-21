@@ -19,6 +19,7 @@ This pipeline separates responsibilities so the system can scale, recover from f
 - **Object Storage:** MinIO (Docker)  
 - **Load Testing:** Apache JMeter
 
+<!--
 ## Architecture Summary
 
 The pipeline follows an asynchronous event flow:
@@ -59,3 +60,4 @@ This design enables:
 - Observability (metrics, tracing, dashboards)
 - Semantic search over transcriptions/embeddings
 - Multi-tenant processing and workload isolation
+-->
