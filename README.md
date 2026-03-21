@@ -21,8 +21,8 @@ This pipeline separates responsibilities so the system can scale, recover from f
 
 ## 🧪 Test Setup
 
-- **Threads (users):** 50  
-- **Ramp-up period:** 10 seconds  
+- **Threads (users):** 150  
+- **Ramp-up period:** 2 seconds  
 - **Loop count:** 10  
 - **Audio file size:** ~5MB
 
