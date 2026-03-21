@@ -11,3 +11,4 @@ User hits api ( uploads audio file ( mp3 for v1 testing ) ) ->
 [4] Using dto to serve requests since it prevents tight coupling and separates the entity from the request handling.
     essentially  Represents what the API accepts/returns , validation basically .
     Ex. Here we wouldn't want the user to send his ip address , we can extract it anyways.
+[5] using cloud neon db for lesser hosting overhead / alternative would be to run the docker container on a vm or other cloud provider aws/ gcp.
