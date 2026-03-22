@@ -1,14 +1,139 @@
-[1] Async audio ingestion pipeline <br/>
-[2] hit the api /upload <br/>
-User hits api ( uploads audio file ( mp3 for v1 testing ) ) ->
-->validation and limit ( rate limiting ) ->
---> compression and other? <br/>
+# Technical Flow Notes - Async Audio Pipeline
 
---> file is stored in object storage
+## 1) Request Path (API)
 
-[3] Springboot is multithreaded by nature  , it handles apis via thread pool of 200 workers thus if more then requests are queued 
+Client uploads audio to API endpoint.
 
-[4] Using dto to serve requests since it prevents tight coupling and separates the entity from the request handling.
-    essentially  Represents what the API accepts/returns , validation basically .
-    Ex. Here we wouldn't want the user to send his ip address , we can extract it anyways.
-[5] using cloud neon db for lesser hosting overhead / alternative would be to run the docker container on a vm or other cloud provider aws/ gcp.
+API responsibilities are intentionally lightweight:
+
+- validate file type/size
+- extract request metadata (for example client IP)
+- store raw audio object in MinIO/S3-compatible storage
+- persist upload metadata in PostgreSQL
+- create processing job row
+- publish `audio.uploaded` event
+- return quickly with `audioId`, `jobId`, and queued status
+
+No heavy audio processing should run in API request threads.
+
+---
+
+## 2) Queue and Event Flow
+
+RabbitMQ topic exchange:
+
+- `audio.processing.exchange`
+
+Primary routing keys:
+
+- `audio.uploaded`
+- `audio.normalized`
+- `audio.transcribed`
+- `audio.embedded`
+
+Stage workers consume from dedicated queues and publish the next stage event.
+
+---
+
+## 3) Worker Responsibilities
+
+Normalization worker:
+
+- consume `audio.uploaded`
+- download raw object from storage
+- run FFmpeg normalization/format policy
+- upload normalized object
+- update job status
+- publish `audio.normalized`
+
+Transcription worker:
+
+- consume `audio.normalized`
+- download normalized object
+- run Whisper transcription
+- store transcript in DB
+- update job status
+- publish `audio.transcribed`
+
+Embedding worker (future):
+
+- consume `audio.transcribed`
+- generate embeddings and store vector data
+- publish `audio.embedded`
+
+---
+
+## 4) Reliability Rules
+
+- workers use manual acknowledgements
+- ACK only after durable success (DB + storage + next publish)
+- transient failures retry with bounded backoff
+- exhausted failures route to DLQ
+- handlers are idempotent for redelivered messages
+
+---
+
+## 5) Data Contracts
+
+Use DTO/event payloads to avoid tight coupling between storage entities and API/worker contracts.
+
+Event envelope should include:
+
+- `eventType`
+- `eventVersion`
+- `eventId`
+- `occurredAt`
+- `traceId`
+- `payload`
+
+Payload baseline fields:
+
+- `audioFileId`
+- `jobId`
+- `objectKey`
+
+---
+
+## 6) Data Storage Layout
+
+Object storage:
+
+- raw audio object path
+- normalized audio object path
+
+PostgreSQL:
+
+- `audiofile` for upload metadata
+- `audio_processing_jobs` for stage/status lifecycle
+- `transcripts` for generated transcript data
+
+---
+
+## 7) API Read Endpoints (Target)
+
+- `GET /api/jobs/{jobId}` for stage/status/retry/error
+- `GET /api/audio/{audioId}/transcript` for transcript retrieval
+
+Optional aggregate endpoint:
+
+- `GET /api/audio/{audioId}` to return metadata + latest processing state
+
+---
+
+## 8) Local Development Baseline
+
+Use Docker for local infra:
+
+- RabbitMQ
+- PostgreSQL
+- MinIO
+
+Run API and workers separately for clear service boundaries.
+
+---
+
+## 9) Why This Design
+
+This design keeps upload latency low, allows horizontal worker scaling, and isolates failures by stage.
+
+It is designed to model real distributed backend behavior under load and failure, not only happy-path functionality.
