@@ -13,6 +13,26 @@ spring:
     multipart:
       max-file-size: ${SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE:20MB}
       max-request-size: ${SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE:20MB}
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:guest}
+    password: ${SPRING_RABBITMQ_PASSWORD:guest}
+
+app:
+  rabbitmq:
+    exchange: ${APP_RABBITMQ_EXCHANGE:audio.processing.exchange}
+    normalization-queue: ${APP_RABBITMQ_NORMALIZATION_QUEUE:audio.normalization.queue}
+    transcription-queue: ${APP_RABBITMQ_TRANSCRIPTION_QUEUE:audio.transcription.queue}
+    embedding-queue: ${APP_RABBITMQ_EMBEDDING_QUEUE:audio.embedding.queue}
+    normalization-dlq: ${APP_RABBITMQ_NORMALIZATION_DLQ:audio.normalization.dlq}
+    transcription-dlq: ${APP_RABBITMQ_TRANSCRIPTION_DLQ:audio.transcription.dlq}
+    embedding-dlq: ${APP_RABBITMQ_EMBEDDING_DLQ:audio.embedding.dlq}
+    dead-letter-exchange: ${APP_RABBITMQ_DEAD_LETTER_EXCHANGE:audio.processing.dlx}
+    uploaded-routing-key: ${APP_RABBITMQ_UPLOADED_ROUTING_KEY:audio.uploaded}
+    normalized-routing-key: ${APP_RABBITMQ_NORMALIZED_ROUTING_KEY:audio.normalized}
+    transcribed-routing-key: ${APP_RABBITMQ_TRANSCRIBED_ROUTING_KEY:audio.transcribed}
+    embedded-routing-key: ${APP_RABBITMQ_EMBEDDED_ROUTING_KEY:audio.embedded}
 
 minio:
   url: ${MINIO_URL:http://localhost:9000}

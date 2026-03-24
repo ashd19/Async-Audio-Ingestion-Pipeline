@@ -1,6 +1,7 @@
 package com.AudioPipeline.controller;
 
 import com.AudioPipeline.dto.AudioFileDto;
+import com.AudioPipeline.dto.AudioJobStatusDto;
 import com.AudioPipeline.service.AudioFileService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.io.InputStreamResource;
@@ -44,5 +45,11 @@ public class FileController {
                 .contentLength(downloadedFile.size())
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + downloadedFile.fileName() + "\"")
                 .body(new InputStreamResource(stream));
+    }
+
+    @GetMapping("/jobs/{jobId}")
+    public ResponseEntity<AudioJobStatusDto> getJobStatus(@PathVariable Long jobId) {
+        AudioJobStatusDto status = audioFileService.getJobStatus(jobId);
+        return ResponseEntity.ok(status);
     }
 }
