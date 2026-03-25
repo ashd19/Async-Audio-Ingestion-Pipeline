@@ -1,0 +1,47 @@
+2026/03/24 23:48:55 INFO  - jmeter.util.JMeterUtils: Setting Locale to en_US 
+2026/03/24 23:48:55 INFO  - jmeter.JMeter: Loading user properties from: /usr/share/jmeter/bin/user.properties 
+2026/03/24 23:48:55 INFO  - jmeter.JMeter: Loading system properties from: /usr/share/jmeter/bin/system.properties 
+2026/03/24 23:48:55 INFO  - jmeter.JMeter: Copyright (c) 1998-2015 The Apache Software Foundation 
+2026/03/24 23:48:55 INFO  - jmeter.JMeter: Version 2.13.19691222 
+2026/03/24 23:48:55 INFO  - jmeter.JMeter: java.version=21.0.10 
+2026/03/24 23:48:55 INFO  - jmeter.JMeter: java.vm.name=OpenJDK 64-Bit Server VM 
+2026/03/24 23:48:55 INFO  - jmeter.JMeter: os.name=Linux 
+2026/03/24 23:48:55 INFO  - jmeter.JMeter: os.arch=amd64 
+2026/03/24 23:48:55 INFO  - jmeter.JMeter: os.version=6.17.0-19-generic 
+2026/03/24 23:48:55 INFO  - jmeter.JMeter: file.encoding=UTF-8 
+2026/03/24 23:48:55 INFO  - jmeter.JMeter: Default Locale=English (United States) 
+2026/03/24 23:48:55 INFO  - jmeter.JMeter: JMeter  Locale=English (United States) 
+2026/03/24 23:48:55 INFO  - jmeter.JMeter: JMeterHome=/usr/share/jmeter 
+2026/03/24 23:48:55 INFO  - jmeter.JMeter: user.dir  =/home/ash/coding/audioPipeline 
+2026/03/24 23:48:55 INFO  - jmeter.JMeter: PWD       =/home/ash/coding/audioPipeline 
+2026/03/24 23:48:55 INFO  - jmeter.JMeter: IP: 127.0.1.1 Name: ash FullName: ash 
+2026/03/24 23:48:55 INFO  - jmeter.services.FileServer: Default base='/home/ash/coding/audioPipeline' 
+2026/03/24 23:48:55 INFO  - jmeter.services.FileServer: Set new base='/home/ash/coding/audioPipeline/AudioPipeline/src/main/java/com/AudioPipeline/utils' 
+2026/03/24 23:48:55 INFO  - jmeter.save.SaveService: Testplan (JMX) version: 2.2. Testlog (JTL) version: 2.2 
+2026/03/24 23:48:55 INFO  - jmeter.save.SaveService: Using SaveService properties version 2.8 
+2026/03/24 23:48:55 INFO  - jmeter.save.SaveService: Using SaveService properties file version 1656252 
+2026/03/24 23:48:55 INFO  - jmeter.save.SaveService: Using SaveService properties file encoding UTF-8 
+2026/03/24 23:48:55 INFO  - jmeter.save.SaveService: All converter versions present and correct 
+2026/03/24 23:48:55 INFO  - jmeter.save.SaveService: Loading file: AudioPipeline/src/main/java/com/AudioPipeline/utils/Graph Results.jmx 
+2026/03/24 23:48:55 ERROR - jmeter.JMeter: Error in NonGUIDriver com.thoughtworks.xstream.security.ForbiddenClassException: org.apache.jmeter.save.ScriptWrapper
+	at com.thoughtworks.xstream.security.NoTypePermission.allows(NoTypePermission.java:26)
+	at com.thoughtworks.xstream.mapper.SecurityMapper.realClass(SecurityMapper.java:74)
+	at com.thoughtworks.xstream.mapper.MapperWrapper.realClass(MapperWrapper.java:125)
+	at org.apache.jmeter.save.SaveService$XStreamWrapper$1.realClass(SaveService.java:94)
+	at com.thoughtworks.xstream.mapper.MapperWrapper.realClass(MapperWrapper.java:125)
+	at com.thoughtworks.xstream.mapper.CachingMapper.realClass(CachingMapper.java:47)
+	at com.thoughtworks.xstream.core.util.HierarchicalStreams.readClassType(HierarchicalStreams.java:29)
+	at com.thoughtworks.xstream.core.TreeUnmarshaller.start(TreeUnmarshaller.java:135)
+	at com.thoughtworks.xstream.core.AbstractTreeMarshallingStrategy.unmarshal(AbstractTreeMarshallingStrategy.java:32)
+	at com.thoughtworks.xstream.XStream.unmarshal(XStream.java:1464)
+	at com.thoughtworks.xstream.XStream.unmarshal(XStream.java:1441)
+	at com.thoughtworks.xstream.XStream.fromXML(XStream.java:1321)
+	at org.apache.jmeter.save.SaveService.readTree(SaveService.java:559)
+	at org.apache.jmeter.save.SaveService.loadTree(SaveService.java:537)
+	at org.apache.jmeter.JMeter.runNonGui(JMeter.java:751)
+	at org.apache.jmeter.JMeter.startNonGui(JMeter.java:738)
+	at org.apache.jmeter.JMeter.start(JMeter.java:397)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.apache.jmeter.NewDriver.main(NewDriver.java:264)
+
