@@ -52,4 +52,11 @@ public class FileController {
         AudioJobStatusDto status = audioFileService.getJobStatus(jobId);
         return ResponseEntity.ok(status);
     }
+
+    @GetMapping("/audio/{audioId}/transcript")
+    public ResponseEntity<?> getTranscript(@PathVariable Long audioId) {
+        return audioFileService.getTranscript(audioId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 }

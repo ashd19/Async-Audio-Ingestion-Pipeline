@@ -4,10 +4,13 @@ import com.AudioPipeline.dto.AudioFileDto;
 import com.AudioPipeline.dto.AudioJobStatusDto;
 import com.AudioPipeline.dto.AudioPipelineEvent;
 import com.AudioPipeline.dto.AudioStagePayload;
+import com.AudioPipeline.dto.TranscriptDto;
 import com.AudioPipeline.entity.AudioFilesEntity;
 import com.AudioPipeline.entity.AudioProcessingJobEntity;
+import com.AudioPipeline.entity.TranscriptEntity;
 import com.AudioPipeline.repository.AudioFileRepository;
 import com.AudioPipeline.repository.AudioProcessingJobRepository;
+import com.AudioPipeline.repository.TranscriptRepository;
 import io.minio.BucketExistsArgs;
 import io.minio.GetObjectArgs;
 import io.minio.GetObjectResponse;
@@ -23,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.io.InputStream;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -30,17 +34,20 @@ public class AudioFileService {
 
     private final AudioFileRepository audioFileRepository;
     private final AudioProcessingJobRepository jobRepository;
+    private final TranscriptRepository transcriptRepository;
     private final AudioEventPublisher audioEventPublisher;
     private final MinioClient minioClient;
     private final String bucketName;
 
     public AudioFileService(AudioFileRepository audioFileRepository,
                             AudioProcessingJobRepository jobRepository,
+                            TranscriptRepository transcriptRepository,
                             AudioEventPublisher audioEventPublisher,
                             MinioClient minioClient,
                             com.AudioPipeline.Configuration.MinioConfig minioConfig) {
         this.audioFileRepository = audioFileRepository;
         this.jobRepository = jobRepository;
+        this.transcriptRepository = transcriptRepository;
         this.audioEventPublisher = audioEventPublisher;
         this.minioClient = minioClient;
         this.bucketName = minioConfig.getBucket();
@@ -199,6 +206,18 @@ public class AudioFileService {
         job.setCompletedAt(LocalDateTime.now());
         jobRepository.save(job);
         audioEventPublisher.publishEmbeddedEvent(payload.audioFileId(), job.getId(), payload.objectKey(), job.getTraceId());
+    }
+
+    public Optional<TranscriptDto> getTranscript(Long audioFileId) {
+        return transcriptRepository.findByAudioFileId(audioFileId)
+                .map(entity -> new TranscriptDto(
+                        entity.getId(),
+                        entity.getAudioFileId(),
+                        entity.getJobId(),
+                        entity.getTranscriptText(),
+                        entity.getLanguage(),
+                        entity.getConfidence()
+                ));
     }
 
     private AudioProcessingJobEntity loadJob(Long jobId) {

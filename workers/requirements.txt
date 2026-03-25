@@ -1,0 +1,25 @@
+# Python Worker Dependencies for Audio Pipeline
+
+# RabbitMQ Client
+pika==1.3.2
+
+# MinIO SDK for Python
+minio==7.2.5
+
+# FFmpeg Python Wrapper
+ffmpeg-python==0.2.0
+
+# Whisper for Transcription (OpenAI)
+openai-whisper==20231117
+
+# PostgreSQL adapter
+psycopg2-binary==2.9.9
+
+# Environment variable management
+python-dotenv==1.0.1
+
+# HTTP client for health checks
+requests==2.31.0
+
+# Structured logging
+python-json-logger==2.0.7
