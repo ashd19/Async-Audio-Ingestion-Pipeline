@@ -26,18 +26,6 @@ public class AudioEventPublisher {
         publish("audio.uploaded", rabbitMqProperties.getUploadedRoutingKey(), audioFileId, jobId, objectKey, traceId);
     }
 
-    public void publishNormalizedEvent(Long audioFileId, Long jobId, String objectKey, String traceId) {
-        publish("audio.normalized", rabbitMqProperties.getNormalizedRoutingKey(), audioFileId, jobId, objectKey, traceId);
-    }
-
-    public void publishTranscribedEvent(Long audioFileId, Long jobId, String objectKey, String traceId) {
-        publish("audio.transcribed", rabbitMqProperties.getTranscribedRoutingKey(), audioFileId, jobId, objectKey, traceId);
-    }
-
-    public void publishEmbeddedEvent(Long audioFileId, Long jobId, String objectKey, String traceId) {
-        publish("audio.embedded", rabbitMqProperties.getEmbeddedRoutingKey(), audioFileId, jobId, objectKey, traceId);
-    }
-
     private void publish(String eventType, String routingKey, Long audioFileId, Long jobId, String objectKey, String traceId) {
         AudioPipelineEvent event = new AudioPipelineEvent(
                 eventType,

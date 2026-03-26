@@ -12,6 +12,33 @@ The API stays responsive while heavy processing happens asynchronously.
 Traditional synchronous processing can block request threads and fail under load.  
 This pipeline separates responsibilities so the system can scale, recover from failures, and evolve stage by stage.
 
+## 🚀 Getting Started
+
+### 1. Initial Setup
+Run the comprehensive setup script to start Docker infrastructure and prepare the Python environment:
+```bash
+./start-pipeline.sh
+```
+
+### 2. Run the API
+In a new terminal:
+```bash
+cd AudioPipeline && ./mvnw spring-boot:run
+```
+
+### 3. Run the Python Workers
+Start both normalization and transcription workers in the background:
+```bash
+./run-python-workers.sh
+```
+- **View logs:** `tail -f workers/*.log`
+- **Stop workers:** `./stop-python-workers.sh`
+
+### 4. Test the Pipeline
+```bash
+curl -X POST http://localhost:8080/api/upload -F "file=@your_audio.mp3"
+```
+
 ## 🛠️ Tech Stack
 
 - **Backend:** Spring Boot  

@@ -2,8 +2,6 @@ package com.AudioPipeline.service;
 
 import com.AudioPipeline.dto.AudioFileDto;
 import com.AudioPipeline.dto.AudioJobStatusDto;
-import com.AudioPipeline.dto.AudioPipelineEvent;
-import com.AudioPipeline.dto.AudioStagePayload;
 import com.AudioPipeline.dto.TranscriptDto;
 import com.AudioPipeline.entity.AudioFilesEntity;
 import com.AudioPipeline.entity.AudioProcessingJobEntity;
@@ -20,7 +18,6 @@ import io.minio.PutObjectArgs;
 import io.minio.StatObjectArgs;
 import io.minio.StatObjectResponse;
 import jakarta.transaction.Transactional;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -163,49 +160,6 @@ public class AudioFileService {
                 .completedAt(job.getCompletedAt())
                 .updatedAt(job.getUpdatedAt())
                 .build();
-    }
-
-    @Transactional
-    @RabbitListener(queues = "${app.rabbitmq.normalization-queue}")
-    public void onUploaded(AudioPipelineEvent event) {
-        AudioStagePayload payload = event.payload();
-        AudioProcessingJobEntity job = loadJob(payload.jobId());
-        job.setStage("NORMALIZATION");
-        job.setStatus("PROCESSING");
-        if (job.getStartedAt() == null) {
-            job.setStartedAt(LocalDateTime.now());
-        }
-        String normalizedObjectKey = "normalized/" + payload.objectKey();
-        job.setObjectKey(normalizedObjectKey);
-        job.setStatus("COMPLETED");
-        jobRepository.save(job);
-        audioEventPublisher.publishNormalizedEvent(payload.audioFileId(), job.getId(), normalizedObjectKey, job.getTraceId());
-    }
-
-    @Transactional
-    @RabbitListener(queues = "${app.rabbitmq.transcription-queue}")
-    public void onNormalized(AudioPipelineEvent event) {
-        AudioStagePayload payload = event.payload();
-        AudioProcessingJobEntity job = loadJob(payload.jobId());
-        job.setStage("TRANSCRIPTION");
-        job.setStatus("PROCESSING");
-        String transcriptPath = "transcripts/" + payload.audioFileId() + ".txt";
-        job.setObjectKey(transcriptPath);
-        job.setStatus("COMPLETED");
-        jobRepository.save(job);
-        audioEventPublisher.publishTranscribedEvent(payload.audioFileId(), job.getId(), transcriptPath, job.getTraceId());
-    }
-
-    @Transactional
-    @RabbitListener(queues = "${app.rabbitmq.embedding-queue}")
-    public void onTranscribed(AudioPipelineEvent event) {
-        AudioStagePayload payload = event.payload();
-        AudioProcessingJobEntity job = loadJob(payload.jobId());
-        job.setStage("EMBEDDING");
-        job.setStatus("COMPLETED");
-        job.setCompletedAt(LocalDateTime.now());
-        jobRepository.save(job);
-        audioEventPublisher.publishEmbeddedEvent(payload.audioFileId(), job.getId(), payload.objectKey(), job.getTraceId());
     }
 
     public Optional<TranscriptDto> getTranscript(Long audioFileId) {
