@@ -66,13 +66,6 @@ else
     echo -e "${YELLOW}⚠️  MinIO may still be starting...${NC}"
 fi
 
-# Check PostgreSQL
-if docker exec audio-pipeline-postgres pg_isready -U postgres > /dev/null 2>&1; then
-    echo -e "${GREEN}✅ PostgreSQL is ready${NC}"
-else
-    echo -e "${YELLOW}⚠️  PostgreSQL may still be starting...${NC}"
-fi
-
 # Check if Python virtual environment exists
 echo ""
 if [ ! -d "workers/venv" ]; then
