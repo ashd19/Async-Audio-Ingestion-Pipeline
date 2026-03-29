@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Get script directory and project root
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+PROJECT_ROOT="$( cd "$SCRIPT_DIR/.." &> /dev/null && pwd )"
+cd "$PROJECT_ROOT"
+
 # Colors for output
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
@@ -11,12 +16,12 @@ echo -e "${BLUE}🛑 Stopping ALL Pipeline Components...${NC}"
 
 # 1. Stop Python Workers
 echo -e "\n${BLUE}🐍 Step 1: Stopping Python Workers...${NC}"
-./stop-python-workers.sh
+"$SCRIPT_DIR/stop-python-workers.sh"
 
 # 2. Stop Java API
 echo -e "\n${BLUE}☕ Step 2: Stopping Spring Boot API...${NC}"
-if [ -f "api.pid" ]; then
-    PID=$(cat api.pid)
+if [ -f "runtime/api.pid" ]; then
+    PID=$(cat runtime/api.pid)
     if ps -p "$PID" > /dev/null; then
         echo -e "${YELLOW}🛑 Stopping Java API (PID: ${PID})...${NC}"
         kill "$PID"
@@ -24,9 +29,9 @@ if [ -f "api.pid" ]; then
     else
         echo -e "${RED}⚠️  API is not running.${NC}"
     fi
-    rm api.pid
+    rm runtime/api.pid
 else
-    echo -e "${RED}⚠️  No API PID file found.${NC}"
+    echo -e "${RED}⚠️  No API PID file found in runtime/api.pid.${NC}"
 fi
 
 # 3. Stop Docker Infrastructure

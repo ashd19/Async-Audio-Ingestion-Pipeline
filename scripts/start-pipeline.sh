@@ -2,6 +2,11 @@
 
 set -e
 
+# Get script directory and project root
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+PROJECT_ROOT="$( cd "$SCRIPT_DIR/.." &> /dev/null && pwd )"
+cd "$PROJECT_ROOT"
+
 echo "🎵 Audio Pipeline - Complete Startup Script"
 echo "============================================"
 
@@ -76,7 +81,7 @@ if [ ! -d "workers/venv" ]; then
     python3 -m venv venv
     source venv/bin/activate
     pip install --quiet -r requirements.txt
-    cd ..
+    cd "$PROJECT_ROOT"
     echo -e "${GREEN}✅ Python environment created${NC}"
 else
     echo -e "${GREEN}✅ Python environment already exists${NC}"
@@ -99,7 +104,7 @@ echo "1️⃣  Start API Server (in a new terminal):"
 echo "   cd AudioPipeline && ./mvnw spring-boot:run"
 echo ""
 echo "2️⃣  Start Python Workers (in this or a new terminal):"
-echo "   ./run-python-workers.sh"
+echo "   ./scripts/run-python-workers.sh"
 echo ""
 echo "3️⃣  Test the pipeline:"
 echo "   curl -X POST http://localhost:8080/api/upload -F \"file=@your_audio.mp3\""
@@ -109,6 +114,6 @@ echo "   API:              http://localhost:8080"
 echo "   RabbitMQ UI:      http://localhost:15672 (guest/guest)"
 echo "   MinIO Console:    http://localhost:9001 (minioadmin/minioadmin)"
 echo "   Worker Logs:      tail -f workers/*.log"
-echo "   Stop Workers:     ./stop-python-workers.sh"
+echo "   Stop Workers:     ./scripts/stop-python-workers.sh"
 echo ""
 echo "🛑 To stop all infrastructure: docker-compose down"

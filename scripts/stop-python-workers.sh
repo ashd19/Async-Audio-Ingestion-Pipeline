@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Get script directory and project root
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+PROJECT_ROOT="$( cd "$SCRIPT_DIR/.." &> /dev/null && pwd )"
+cd "$PROJECT_ROOT"
+
 # Colors for output
 RED='\033[0;31m'
 YELLOW='\033[1;33m'

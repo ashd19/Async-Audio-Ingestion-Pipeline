@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Get script directory and project root
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+PROJECT_ROOT="$( cd "$SCRIPT_DIR/.." &> /dev/null && pwd )"
+cd "$PROJECT_ROOT"
+
 # Colors for output
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -16,7 +21,7 @@ if [ ! -d "workers/venv" ]; then
     python3 -m venv venv
     source venv/bin/activate
     pip install -r requirements.txt
-    cd ..
+    cd "$PROJECT_ROOT"
 fi
 
 # Activate virtual environment
@@ -46,5 +51,5 @@ start_worker "transcription_worker.py" "transcription_worker"
 
 echo ""
 echo -e "${GREEN}✨ Both workers are running in the background!${NC}"
-echo -e "To stop them, run: ${YELLOW}./stop-python-workers.sh${NC}"
+echo -e "To stop them, run: ${YELLOW}./scripts/stop-python-workers.sh${NC}"
 echo -e "To view logs: ${YELLOW}tail -f workers/*.log${NC}"
