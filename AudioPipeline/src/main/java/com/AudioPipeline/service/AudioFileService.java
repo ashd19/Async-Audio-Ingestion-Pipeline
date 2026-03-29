@@ -99,6 +99,7 @@ public class AudioFileService {
                 .stage(savedJob.getStage())
                 .status(savedJob.getStatus())
                 .traceId(savedJob.getTraceId())
+                .statusUrl("/api/jobs/" + savedJob.getId()) // Still relative, but we'll fix in Controller
                 .build();
     }
 

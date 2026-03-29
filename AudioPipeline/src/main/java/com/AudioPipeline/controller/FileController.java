@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import java.io.InputStream;
 
 @RestController
@@ -28,7 +30,14 @@ public class FileController {
     public ResponseEntity<AudioFileDto> uploadFile(@RequestParam("file") MultipartFile file,
                                                     HttpServletRequest request) throws Exception {
         AudioFileDto saved = audioFileService.uploadFile(file, request.getRemoteAddr());
-        return ResponseEntity.ok(saved);
+
+        // Build absolute URL for the status endpoint
+        String absoluteStatusUrl = ServletUriComponentsBuilder.fromContextPath(request)
+                .path(saved.getStatusUrl())
+                .toUriString();
+        saved.setStatusUrl(absoluteStatusUrl);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(saved);
     }
 
     @GetMapping("/files/{objectKey}")

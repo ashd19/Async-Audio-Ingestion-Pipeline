@@ -294,10 +294,9 @@ Monitor via: `GET /api/jobs/{jobId}`
 ## 🚧 Known Limitations & Future Work
 
 ### To Remove/Clean Up
-- ⚠️ **AudioFileService** still has in-process `@RabbitListener` methods
-  - These are simulation code and should be removed
-  - Workers now handle actual processing
-  - Lines 162-202 in AudioFileService.java
+- ✅ **AudioFileService** redundant `@RabbitListener` methods removed
+  - Workers now handle actual processing autonomously
+  - Java API is focused on upload and status tracking
 
 ### Future Enhancements (Not Critical)
 - [ ] Exponential backoff for retries (currently immediate retry)

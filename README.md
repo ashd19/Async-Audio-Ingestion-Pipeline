@@ -14,6 +14,20 @@ This pipeline separates responsibilities so the system can scale, recover from f
 
 ## 🚀 Getting Started
 
+### 🟢 Run Everything (One-shot)
+To start infrastructure, the API, and all workers at once:
+```bash
+./start-everything.sh
+```
+- **Stop everything:** `./stop-everything.sh`
+- **View API logs:** `tail -f api.log`
+- **View Worker logs:** `tail -f workers/*.log`
+
+---
+
+### 🟡 Manual Setup (Step-by-Step)
+If you prefer running components individually:
+
 ### 1. Initial Setup
 Run the comprehensive setup script to start Docker infrastructure and prepare the Python environment:
 ```bash

@@ -23,4 +23,5 @@ public class AudioFileDto {
     private String stage;
     private String status;
     private String traceId;
+    private String statusUrl;
 }
