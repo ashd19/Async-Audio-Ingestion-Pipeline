@@ -56,7 +56,7 @@ curl -X POST http://localhost:8080/api/upload -F "file=@your_audio.mp3"
 ## 🛠️ Tech Stack
 
 - **Backend:** Spring Boot  
-- **Database:** PostgreSQL (NeonDB)  
+- **Database:** PostgreSQL (Neon)  
 - **Object Storage:** MinIO (Docker)  
 - **Load Testing:** Apache JMeter
 

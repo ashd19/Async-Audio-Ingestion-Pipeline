@@ -73,6 +73,93 @@ class WorkerBase(ABC):
             self.rabbitmq_connection = pika.BlockingConnection(parameters)
             self.rabbitmq_channel = self.rabbitmq_connection.channel()
             self.rabbitmq_channel.basic_qos(prefetch_count=1)
+
+            # Ensure exchanges/queues exist
+            exchange = os.getenv('RABBITMQ_EXCHANGE', 'audio.processing.exchange')
+            dead_letter_exchange = os.getenv('DEAD_LETTER_EXCHANGE', 'audio.processing.dlx')
+
+            normalization_queue = os.getenv('NORMALIZATION_QUEUE', 'audio.normalization.queue')
+            transcription_queue = os.getenv('TRANSCRIPTION_QUEUE', 'audio.transcription.queue')
+            embedding_queue = os.getenv('EMBEDDING_QUEUE', 'audio.embedding.queue')
+
+            normalization_dlq = os.getenv('NORMALIZATION_DLQ', 'audio.normalization.dlq')
+            transcription_dlq = os.getenv('TRANSCRIPTION_DLQ', 'audio.transcription.dlq')
+            embedding_dlq = os.getenv('EMBEDDING_DLQ', 'audio.embedding.dlq')
+
+            uploaded_routing_key = os.getenv('UPLOADED_ROUTING_KEY', 'audio.uploaded')
+            normalized_routing_key = os.getenv('NORMALIZED_ROUTING_KEY', 'audio.normalized')
+            transcribed_routing_key = os.getenv('TRANSCRIBED_ROUTING_KEY', 'audio.transcribed')
+
+            self.rabbitmq_channel.exchange_declare(
+                exchange=exchange,
+                exchange_type='topic',
+                durable=True
+            )
+            self.rabbitmq_channel.exchange_declare(
+                exchange=dead_letter_exchange,
+                exchange_type='direct',
+                durable=True
+            )
+
+            self.rabbitmq_channel.queue_declare(
+                queue=normalization_queue,
+                durable=True,
+                arguments={
+                    'x-dead-letter-exchange': dead_letter_exchange,
+                    'x-dead-letter-routing-key': normalization_dlq
+                }
+            )
+            self.rabbitmq_channel.queue_declare(
+                queue=transcription_queue,
+                durable=True,
+                arguments={
+                    'x-dead-letter-exchange': dead_letter_exchange,
+                    'x-dead-letter-routing-key': transcription_dlq
+                }
+            )
+            self.rabbitmq_channel.queue_declare(
+                queue=embedding_queue,
+                durable=True,
+                arguments={
+                    'x-dead-letter-exchange': dead_letter_exchange,
+                    'x-dead-letter-routing-key': embedding_dlq
+                }
+            )
+
+            self.rabbitmq_channel.queue_declare(queue=normalization_dlq, durable=True)
+            self.rabbitmq_channel.queue_declare(queue=transcription_dlq, durable=True)
+            self.rabbitmq_channel.queue_declare(queue=embedding_dlq, durable=True)
+
+            self.rabbitmq_channel.queue_bind(
+                queue=normalization_queue,
+                exchange=exchange,
+                routing_key=uploaded_routing_key
+            )
+            self.rabbitmq_channel.queue_bind(
+                queue=transcription_queue,
+                exchange=exchange,
+                routing_key=normalized_routing_key
+            )
+            self.rabbitmq_channel.queue_bind(
+                queue=embedding_queue,
+                exchange=exchange,
+                routing_key=transcribed_routing_key
+            )
+            self.rabbitmq_channel.queue_bind(
+                queue=normalization_dlq,
+                exchange=dead_letter_exchange,
+                routing_key=normalization_dlq
+            )
+            self.rabbitmq_channel.queue_bind(
+                queue=transcription_dlq,
+                exchange=dead_letter_exchange,
+                routing_key=transcription_dlq
+            )
+            self.rabbitmq_channel.queue_bind(
+                queue=embedding_dlq,
+                exchange=dead_letter_exchange,
+                routing_key=embedding_dlq
+            )
             
             # MinIO
             self.logger.info(f"Connecting to MinIO...", extra={'traceId': 'init'})
@@ -85,13 +172,21 @@ class WorkerBase(ABC):
             
             # PostgreSQL
             self.logger.info(f"Connecting to PostgreSQL...", extra={'traceId': 'init'})
-            self.db_connection = psycopg2.connect(
-                host=os.getenv('DB_HOST', 'localhost'),
-                port=int(os.getenv('DB_PORT', '5432')),
-                database=os.getenv('DB_NAME', 'audiopipeline'),
-                user=os.getenv('DB_USER', 'postgres'),
-                password=os.getenv('DB_PASSWORD', 'postgres')
-            )
+            db_url = os.getenv('DATABASE_URL') or os.getenv('DB_URL')
+            if db_url:
+                self.db_connection = psycopg2.connect(db_url)
+            else:
+                connect_kwargs = {
+                    'host': os.getenv('DB_HOST', 'localhost'),
+                    'port': int(os.getenv('DB_PORT', '5432')),
+                    'database': os.getenv('DB_NAME', 'audiopipeline'),
+                    'user': os.getenv('DB_USER', 'postgres'),
+                    'password': os.getenv('DB_PASSWORD', 'postgres')
+                }
+                sslmode = os.getenv('DB_SSLMODE')
+                if sslmode:
+                    connect_kwargs['sslmode'] = sslmode
+                self.db_connection = psycopg2.connect(**connect_kwargs)
             self.db_connection.autocommit = False
             
             self.logger.info(f"{self.worker_name} initialized successfully", extra={'traceId': 'init'})

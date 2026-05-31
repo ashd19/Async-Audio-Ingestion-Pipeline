@@ -1,4 +1,10 @@
-Traceback (most recent call last):
-  File "/home/ash/coding/audioPipeline/workers/transcription_worker.py", line 4, in <module>
-    import whisper
-ModuleNotFoundError: No module named 'whisper'
+/Users/ash/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+{"asctime": "2026-05-31 12:20:30,621", "name": "TranscriptionWorker", "levelname": "INFO", "message": "Connecting to RabbitMQ...", "traceId": "init"}
+{"asctime": "2026-05-31 12:20:30,658", "name": "TranscriptionWorker", "levelname": "INFO", "message": "Connecting to MinIO...", "traceId": "init"}
+{"asctime": "2026-05-31 12:20:30,658", "name": "TranscriptionWorker", "levelname": "INFO", "message": "Connecting to PostgreSQL...", "traceId": "init"}
+{"asctime": "2026-05-31 12:20:32,438", "name": "TranscriptionWorker", "levelname": "INFO", "message": "TranscriptionWorker initialized successfully", "traceId": "init"}
+{"asctime": "2026-05-31 12:20:32,438", "name": "TranscriptionWorker", "levelname": "INFO", "message": "Loading Whisper model: base", "traceId": "init"}
+{"asctime": "2026-05-31 12:20:33,219", "name": "TranscriptionWorker", "levelname": "INFO", "message": "Whisper model loaded", "traceId": "init"}
+{"asctime": "2026-05-31 12:20:33,220", "name": "TranscriptionWorker", "levelname": "INFO", "message": "Starting TranscriptionWorker consumer on queue: audio.transcription.queue", "traceId": null}
+{"asctime": "2026-05-31 12:20:33,221", "name": "TranscriptionWorker", "levelname": "INFO", "message": "TranscriptionWorker is waiting for messages...", "traceId": null}

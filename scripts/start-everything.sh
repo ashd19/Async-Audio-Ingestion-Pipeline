@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -eEuo pipefail
+trap 'echo "❌ Startup failed at: ${BASH_COMMAND}" >&2' ERR
+
 # Get script directory and project root
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 PROJECT_ROOT="$( cd "$SCRIPT_DIR/.." &> /dev/null && pwd )"
@@ -57,3 +60,6 @@ echo -e "API Logs:         ${BLUE}tail -f runtime/api.log${NC}"
 echo -e "Worker Logs:      ${BLUE}tail -f workers/*.log${NC}"
 echo "--------------------------------------------"
 echo -e "To stop everything, run: ${YELLOW}./scripts/stop-everything.sh${NC}"
+
+echo -e "\n${BLUE}🚀 Starting JMeter...${NC}"
+jmeter -t "$PROJECT_ROOT/AudioPipeline/src/main/java/com/AudioPipeline/utils/Graph Results.jmx"

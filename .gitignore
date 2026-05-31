@@ -1,6 +1,11 @@
 todo.md
 contexts
 .env
+workers/.env
+.venv/
+venv/
+workers/.venv/
+workers/venv/
 context.md
 .idea/
 agents.md

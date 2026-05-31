@@ -25,12 +25,17 @@ if ! docker info > /dev/null 2>&1; then
 fi
 echo -e "${GREEN}✅ Docker is running${NC}"
 
-# Check if Python 3 is available
-if ! command -v python3 &> /dev/null; then
-    echo -e "${RED}❌ Error: Python 3 is not installed.${NC}"
+# Check if Python is available (python3 preferred)
+SYS_PYTHON=""
+if command -v python3 &> /dev/null; then
+    SYS_PYTHON="python3"
+elif command -v python &> /dev/null; then
+    SYS_PYTHON="python"
+else
+    echo -e "${RED}❌ Error: Python is not installed (python3 or python).${NC}"
     exit 1
 fi
-echo -e "${GREEN}✅ Python 3 is available${NC}"
+echo -e "${GREEN}✅ Python is available (${SYS_PYTHON})${NC}"
 
 # Check if Java is available
 if ! command -v java &> /dev/null; then
@@ -71,7 +76,7 @@ echo ""
 if [ ! -d "workers/venv" ]; then
     echo "📦 Setting up Python virtual environment..."
     cd workers
-    python3 -m venv venv
+    "$SYS_PYTHON" -m venv venv
     source venv/bin/activate
     pip install --quiet -r requirements.txt
     cd "$PROJECT_ROOT"

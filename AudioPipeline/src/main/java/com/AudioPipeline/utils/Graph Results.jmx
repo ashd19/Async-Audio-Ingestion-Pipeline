@@ -24,16 +24,16 @@
           <stringProp name="HTTPSampler.domain">localhost</stringProp>
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
-          <stringProp name="HTTPSampler.path">api/upload</stringProp>
+          <stringProp name="HTTPSampler.path">/api/upload</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
           <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
           <boolProp name="HTTPSampler.DO_MULTIPART_POST">true</boolProp>
           <elementProp name="HTTPsampler.Files" elementType="HTTPFileArgs">
             <collectionProp name="HTTPFileArgs.files">
-              <elementProp name="/home/ash/coding/audioPipeline/AudioPipeline/src/main/java/com/AudioPipeline/utils/SampleAudioFile.mp3" elementType="HTTPFileArg">
+              <elementProp name="AudioPipeline/src/main/java/com/AudioPipeline/utils/SampleAudioFile.mp3" elementType="HTTPFileArg">
                 <stringProp name="File.mimetype">audio/mpeg</stringProp>
-                <stringProp name="File.path">/home/ash/coding/audioPipeline/AudioPipeline/src/main/java/com/AudioPipeline/utils/SampleAudioFile.mp3</stringProp>
+                <stringProp name="File.path">AudioPipeline/src/main/java/com/AudioPipeline/utils/SampleAudioFile.mp3</stringProp>
                 <stringProp name="File.paramname">file</stringProp>
               </elementProp>
             </collectionProp>
