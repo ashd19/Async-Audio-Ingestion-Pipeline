@@ -1,113 +1,153 @@
 # Async Audio Ingestion Pipeline
 
-A production-style asynchronous audio processing system built to demonstrate scalable backend architecture, not just file upload + transcription.
+An end-to-end audio ingestion system that shows how a synchronous upload flow breaks under load, then how an event-driven design restores throughput and responsiveness.
 
-## Overview
+This project is structured as a two-part case study:
 
-This project is designed around an event-driven workflow where audio is uploaded, queued, and processed by background workers in stages.  
-The API stays responsive while heavy processing happens asynchronously.
+- Part 1: synchronous upload path and load-test results
+- Part 2: asynchronous refactor with RabbitMQ-backed background processing
 
-### Why this project
+## What This Demonstrates
 
-Traditional synchronous processing can block request threads and fail under load.  
-This pipeline separates responsibilities so the system can scale, recover from failures, and evolve stage by stage.
+- How request-thread blocking affects latency under concurrent file uploads
+- How event-driven architecture reduces pressure on the API layer
+- How to split ingestion, normalization, and transcription into separate stages
+- How MinIO, PostgreSQL, RabbitMQ, Spring Boot, and Python workers fit together
 
-## 🚀 Getting Started
+## Part 1: Synchronous Baseline
 
-### 🟢 Run Everything (One-shot)
-To start infrastructure, the API, and all workers at once:
+The initial flow was straightforward:
+
+`upload file -> store to MinIO -> save path to DB -> respond`
+
+Every step ran inside the same request thread.
+
+### Load Test
+
+- 150 concurrent users
+- 2 second ramp-up
+- ~5 MB audio files
+- Apache JMeter
+
+### Results
+
+- Average latency: ~10s
+- Max latency: 83s
+- Throughput: ~11-12 req/sec
+
+### What Was Happening
+
+Spring Boot's default Tomcat thread pool has 200 threads. Each request blocked on two sequential I/O operations:
+
+1. Writing a 5 MB file to MinIO
+2. Persisting the file path to PostgreSQL
+
+At 150 concurrent users, most of the thread pool was occupied waiting on I/O. The system did not crash, but requests queued up and latency climbed quickly.
+
+![Synchronous test summary](images/Synchronous_test_SummaryReport.png)
+
+## Part 2: Event-Driven Refactor
+
+The second iteration moves processing off the request path:
+
+`upload -> MinIO -> save metadata/job record -> publish audio.uploaded event -> return 202 Accepted`
+
+Background workers then consume the event and perform:
+
+- Audio normalization
+- Audio transcription
+
+### Load Test
+
+- 150 concurrent users
+- 2 second ramp-up
+- ~5 MB audio files
+
+### Results
+
+| Metric | Synchronous | Event-Driven |
+| --- | ---: | ---: |
+| Average latency | ~10s | ~7s |
+| Max latency | 83s | ~15s |
+| Throughput | ~11-12 req/sec | ~20 req/sec |
+| Request failures | Not reported | 0% |
+
+### Key Insight
+
+RabbitMQ absorbed bursts by buffering 1500+ jobs, which let the API return quickly while workers processed audio in the background.
+
+### Takeaway
+
+Moving work out of the request thread made the API more responsive and more resilient under heavy upload traffic.
+
+![Sample API response](images/2nd-iteration/SampleApiResponse.jpeg)
+![RabbitMQ dashboard](images/2nd-iteration/RabbitMq_Dashboard.jpeg)
+![MinIO files](images/2nd-iteration/Minio_Files.jpeg)
+![Summary report](images/2nd-iteration/Summary_Report.jpeg)
+
+## Stack
+
+- Spring Boot
+- RabbitMQ
+- Python
+- MinIO
+- PostgreSQL
+- Apache JMeter
+
+## Project Layout
+
+- `AudioPipeline/` - Spring Boot API and supporting domain code
+- `workers/` - Python background workers
+- `scripts/` - startup and shutdown helpers
+- `images/` - benchmark screenshots and pipeline visuals
+
+## Run Locally
+
+### One-shot startup
+
+Start Docker infrastructure, the API, and the workers:
+
 ```bash
-./start-everything.sh
+./scripts/start-everything.sh
 ```
-- **Stop everything:** `./stop-everything.sh`
-- **View API logs:** `tail -f api.log`
-- **View Worker logs:** `tail -f workers/*.log`
 
----
+Stop everything:
 
-### 🟡 Manual Setup (Step-by-Step)
-If you prefer running components individually:
-
-### 1. Initial Setup
-Run the comprehensive setup script to start Docker infrastructure and prepare the Python environment:
 ```bash
-./start-pipeline.sh
+./scripts/stop-everything.sh
 ```
 
-### 2. Run the API
-In a new terminal:
+### Manual startup
+
+Start the infrastructure and prepare the Python environment:
+
+```bash
+./scripts/start-pipeline.sh
+```
+
+Start the Spring Boot API:
+
 ```bash
 cd AudioPipeline && ./mvnw spring-boot:run
 ```
 
-### 3. Run the Python Workers
-Start both normalization and transcription workers in the background:
-```bash
-./run-python-workers.sh
-```
-- **View logs:** `tail -f workers/*.log`
-- **Stop workers:** `./stop-python-workers.sh`
+Start the Python workers:
 
-### 4. Test the Pipeline
+```bash
+./scripts/run-python-workers.sh
+```
+
+### Test the upload API
+
 ```bash
 curl -X POST http://localhost:8080/api/upload -F "file=@your_audio.mp3"
 ```
 
-## 🛠️ Tech Stack
+## Worker Notes
 
-- **Backend:** Spring Boot  
-- **Database:** PostgreSQL (Neon)  
-- **Object Storage:** MinIO (Docker)  
-- **Load Testing:** Apache JMeter
+The worker setup and dependencies are documented in [`workers/README.md`](workers/README.md).
 
-## 🧪 Test Setup
+## Screenshots
 
-- **Threads (users):** 150  
-- **Ramp-up period:** 2 seconds  
-- **Loop count:** 10  
-- **Audio file size:** ~5MB
-
-
-
-<!--
-## Architecture Summary
-
-The pipeline follows an asynchronous event flow:
-
-`audio.uploaded` → `audio.normalized` → `audio.transcribed` → `audio.embedded`
-
-At each stage, a worker:
-
-1. Consumes the incoming event
-2. Processes the audio/job payload
-3. Persists artifacts/results
-4. Publishes the next event
-
-This design enables:
-
-- loose coupling between services
-- horizontal worker scaling
-- better fault isolation and retries
-- non-blocking API behavior
-
-## Core Design Principles
-
-- **Asynchronous Processing:** No heavy processing in API request/response path
-- **Event-Driven Communication:** Services communicate through events, not tight direct calls
-- **Scalability:** Workers can scale independently based on queue depth and workload
-- **Fault Tolerance:** Failures are isolated; retries and DLQ patterns can be introduced per stage
-
-## What this demonstrates
-
-- Distributed backend system design
-- Message-driven workflow orchestration
-- Handling large file workloads without blocking APIs
-- Real-world architecture thinking beyond CRUD applications
-
-## Future Enhancements
-
-- Real-time/streaming audio ingestion
-- Observability (metrics, tracing, dashboards)
-- Semantic search over transcriptions/embeddings
-- Multi-tenant processing and workload isolation
--->
+- Synchronous baseline: [`images/Synchronous_test_SummaryReport.png`](images/Synchronous_test_SummaryReport.png)
+- Event-driven iteration: [`images/2nd-iteration/Summary_Report.jpeg`](images/2nd-iteration/Summary_Report.jpeg)

@@ -1,10 +1,26 @@
 /Users/ash/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
   warnings.warn(
-{"asctime": "2026-05-31 12:20:30,621", "name": "TranscriptionWorker", "levelname": "INFO", "message": "Connecting to RabbitMQ...", "traceId": "init"}
-{"asctime": "2026-05-31 12:20:30,658", "name": "TranscriptionWorker", "levelname": "INFO", "message": "Connecting to MinIO...", "traceId": "init"}
-{"asctime": "2026-05-31 12:20:30,658", "name": "TranscriptionWorker", "levelname": "INFO", "message": "Connecting to PostgreSQL...", "traceId": "init"}
-{"asctime": "2026-05-31 12:20:32,438", "name": "TranscriptionWorker", "levelname": "INFO", "message": "TranscriptionWorker initialized successfully", "traceId": "init"}
-{"asctime": "2026-05-31 12:20:32,438", "name": "TranscriptionWorker", "levelname": "INFO", "message": "Loading Whisper model: base", "traceId": "init"}
-{"asctime": "2026-05-31 12:20:33,219", "name": "TranscriptionWorker", "levelname": "INFO", "message": "Whisper model loaded", "traceId": "init"}
-{"asctime": "2026-05-31 12:20:33,220", "name": "TranscriptionWorker", "levelname": "INFO", "message": "Starting TranscriptionWorker consumer on queue: audio.transcription.queue", "traceId": null}
-{"asctime": "2026-05-31 12:20:33,221", "name": "TranscriptionWorker", "levelname": "INFO", "message": "TranscriptionWorker is waiting for messages...", "traceId": null}
+{"asctime": "2026-06-02 13:25:11,669", "name": "TranscriptionWorker", "levelname": "INFO", "message": "Connecting to RabbitMQ...", "traceId": "init"}
+{"asctime": "2026-06-02 13:25:11,683", "name": "TranscriptionWorker", "levelname": "INFO", "message": "Connecting to MinIO...", "traceId": "init"}
+{"asctime": "2026-06-02 13:25:11,683", "name": "TranscriptionWorker", "levelname": "INFO", "message": "Connecting to PostgreSQL...", "traceId": "init"}
+{"asctime": "2026-06-02 13:25:13,007", "name": "TranscriptionWorker", "levelname": "INFO", "message": "TranscriptionWorker initialized successfully", "traceId": "init"}
+{"asctime": "2026-06-02 13:25:13,008", "name": "TranscriptionWorker", "levelname": "INFO", "message": "Loading Whisper model: base", "traceId": "init"}
+{"asctime": "2026-06-02 13:25:13,647", "name": "TranscriptionWorker", "levelname": "INFO", "message": "Whisper model loaded", "traceId": "init"}
+{"asctime": "2026-06-02 13:25:13,647", "name": "TranscriptionWorker", "levelname": "INFO", "message": "Starting TranscriptionWorker consumer on queue: audio.transcription.queue", "traceId": null}
+{"asctime": "2026-06-02 13:25:13,650", "name": "TranscriptionWorker", "levelname": "INFO", "message": "TranscriptionWorker is waiting for messages...", "traceId": null}
+{"asctime": "2026-06-02 18:21:39,826", "name": "TranscriptionWorker", "levelname": "ERROR", "message": "Worker crashed: No activity or too many missed heartbeats in the last 600 seconds", "traceId": null}
+{"asctime": "2026-06-02 18:21:39,827", "name": "TranscriptionWorker", "levelname": "INFO", "message": "TranscriptionWorker shutdown complete", "traceId": null}
+Traceback (most recent call last):
+  File "/Users/ash/coding/practice/Async-Audio-Ingestion-Pipeline/workers/transcription_worker.py", line 183, in <module>
+    worker.start()
+  File "/Users/ash/coding/practice/Async-Audio-Ingestion-Pipeline/workers/worker_base.py", line 398, in start
+    self.rabbitmq_channel.start_consuming()
+  File "/Users/ash/Library/Python/3.9/lib/python/site-packages/pika/adapters/blocking_connection.py", line 1883, in start_consuming
+    self._process_data_events(time_limit=None)
+  File "/Users/ash/Library/Python/3.9/lib/python/site-packages/pika/adapters/blocking_connection.py", line 2044, in _process_data_events
+    self.connection.process_data_events(time_limit=time_limit)
+  File "/Users/ash/Library/Python/3.9/lib/python/site-packages/pika/adapters/blocking_connection.py", line 842, in process_data_events
+    self._flush_output(common_terminator)
+  File "/Users/ash/Library/Python/3.9/lib/python/site-packages/pika/adapters/blocking_connection.py", line 523, in _flush_output
+    raise self._closed_result.value.error
+pika.exceptions.AMQPHeartbeatTimeout: No activity or too many missed heartbeats in the last 600 seconds
