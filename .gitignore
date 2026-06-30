@@ -6,6 +6,7 @@ workers/.env
 venv/
 workers/.venv/
 workers/venv/
+workers/.env.example
 context.md
 .idea/
 agents.md
@@ -16,3 +17,5 @@ GEMINI.md
 jmeter.log
 jmeter/
 flow/
+.gitignore.d
+.DS_store
