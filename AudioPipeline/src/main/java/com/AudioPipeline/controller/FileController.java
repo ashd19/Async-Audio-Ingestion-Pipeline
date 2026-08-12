@@ -40,7 +40,7 @@ public class FileController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(saved);
     }
 
-    @GetMapping("/files/{objectKey}")
+    @GetMapping("/files/{*objectKey}")
     public ResponseEntity<InputStreamResource> getFile(@PathVariable String objectKey) throws Exception {
         AudioFileService.DownloadedFile downloadedFile = audioFileService.downloadFile(objectKey);
         InputStream stream = downloadedFile.stream();

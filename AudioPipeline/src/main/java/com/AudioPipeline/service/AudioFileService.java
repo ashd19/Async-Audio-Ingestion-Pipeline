@@ -5,7 +5,6 @@ import com.AudioPipeline.dto.AudioJobStatusDto;
 import com.AudioPipeline.dto.TranscriptDto;
 import com.AudioPipeline.entity.AudioFilesEntity;
 import com.AudioPipeline.entity.AudioProcessingJobEntity;
-import com.AudioPipeline.entity.TranscriptEntity;
 import com.AudioPipeline.repository.AudioFileRepository;
 import com.AudioPipeline.repository.AudioProcessingJobRepository;
 import com.AudioPipeline.repository.TranscriptRepository;
@@ -21,7 +20,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
 import java.io.InputStream;
 import java.util.Optional;
 import java.util.UUID;
@@ -79,7 +77,7 @@ public class AudioFileService {
         AudioProcessingJobEntity job = new AudioProcessingJobEntity();
         job.setAudioFileId(savedEntity.getId());
         job.setObjectKey(savedEntity.getFilePath());
-        job.setStage("UPLOAD");
+        job.setStage("NORMALIZATION");
         job.setStatus("QUEUED");
         job.setRetryCount(0);
         job.setTraceId(traceId);

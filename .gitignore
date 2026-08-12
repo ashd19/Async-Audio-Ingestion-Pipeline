@@ -19,3 +19,6 @@ jmeter/
 flow/
 .gitignore.d
 .DS_store
+graphify-out
+
+

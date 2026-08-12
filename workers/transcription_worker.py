@@ -160,7 +160,7 @@ class TranscriptionWorker(WorkerBase):
             }
             
             routing_key = os.getenv('TRANSCRIBED_ROUTING_KEY', 'audio.transcribed')
-            if not self.publish_event('AUDIO_TRANSCRIBED', next_payload, routing_key, trace_id):
+            if not self.publish_event('audio.transcribed', next_payload, routing_key, trace_id):
                 return False
             
             self.logger.info(

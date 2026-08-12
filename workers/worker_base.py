@@ -18,6 +18,8 @@ load_dotenv()
 
 class WorkerBase(ABC):
     """Base class for all audio pipeline workers with common functionality."""
+
+    STAGE_SEQUENCE = ('UPLOAD', 'NORMALIZATION', 'TRANSCRIPTION', 'EMBEDDING')
     
     def __init__(self, worker_name: str, queue_name: str):
         self.worker_name = worker_name
@@ -284,7 +286,7 @@ class WorkerBase(ABC):
         try:
             event = {
                 'eventType': event_type,
-                'eventVersion': '1.0',
+                'eventVersion': '1',
                 'eventId': str(uuid.uuid4()),
                 'occurredAt': datetime.utcnow().isoformat() + 'Z',
                 'traceId': trace_id,
@@ -326,18 +328,35 @@ class WorkerBase(ABC):
                 return False
             
             current_stage, current_status = result
-            
-            # Allow processing if previous stage completed or if retrying same stage
-            if current_status == 'COMPLETED' and current_stage != expected_stage:
-                return True
-            elif current_stage == expected_stage and current_status in ['QUEUED', 'FAILED']:
-                return True
-            else:
-                self.logger.info(
-                    f"Skipping duplicate processing: job {job_id} at {current_stage}/{current_status}",
+
+            if current_stage not in self.STAGE_SEQUENCE:
+                self.logger.warning(
+                    f"Unknown current stage for job {job_id}: {current_stage}",
                     extra={'traceId': trace_id}
                 )
                 return False
+
+            if expected_stage not in self.STAGE_SEQUENCE:
+                self.logger.warning(
+                    f"Unknown expected stage for job {job_id}: {expected_stage}",
+                    extra={'traceId': trace_id}
+                )
+                return False
+
+            current_index = self.STAGE_SEQUENCE.index(current_stage)
+            expected_index = self.STAGE_SEQUENCE.index(expected_stage)
+
+            if current_stage == expected_stage and current_status in ['QUEUED', 'FAILED']:
+                return True
+
+            if expected_index == current_index + 1 and current_status == 'COMPLETED':
+                return True
+
+            self.logger.info(
+                f"Skipping duplicate or out-of-order processing: job {job_id} at {current_stage}/{current_status}, expected {expected_stage}",
+                extra={'traceId': trace_id}
+            )
+            return False
                 
         except Exception as e:
             self.logger.error(f"Idempotency check failed: {e}", extra={'traceId': trace_id})

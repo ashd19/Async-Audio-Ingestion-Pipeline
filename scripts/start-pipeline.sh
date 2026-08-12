@@ -64,6 +64,13 @@ else
     echo -e "${YELLOW}⚠️  RabbitMQ may still be starting...${NC}"
 fi
 
+# Check PostgreSQL
+if docker exec audio-pipeline-postgres pg_isready -U postgres -d audiopipeline > /dev/null 2>&1; then
+    echo -e "${GREEN}✅ PostgreSQL is ready${NC}"
+else
+    echo -e "${YELLOW}⚠️  PostgreSQL may still be starting...${NC}"
+fi
+
 # Check MinIO
 if curl -s http://localhost:9000/minio/health/live > /dev/null; then
     echo -e "${GREEN}✅ MinIO is ready${NC}"

@@ -117,7 +117,7 @@ class NormalizationWorker(WorkerBase):
             }
             
             routing_key = os.getenv('NORMALIZED_ROUTING_KEY', 'audio.normalized')
-            if not self.publish_event('AUDIO_NORMALIZED', next_payload, routing_key, trace_id):
+            if not self.publish_event('audio.normalized', next_payload, routing_key, trace_id):
                 return False
             
             self.logger.info(

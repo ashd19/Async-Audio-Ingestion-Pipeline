@@ -44,7 +44,7 @@ Spring Boot's default Tomcat thread pool has 200 threads. Each request blocked o
 
 At 150 concurrent users, most of the thread pool was occupied waiting on I/O. The system did not crash, but requests queued up and latency climbed quickly.
 
-![Synchronous test summary](images/Synchronous_test_SummaryReport.png)
+![Synchronous test summary](images/1st-iteration/Synchronous_test_SummaryReport.png)
 
 ## Part 2: Event-Driven Refactor
 
@@ -149,5 +149,5 @@ The worker setup and dependencies are documented in [`workers/README.md`](worker
 
 ## Screenshots
 
-- Synchronous baseline: [`images/Synchronous_test_SummaryReport.png`](images/Synchronous_test_SummaryReport.png)
+- Synchronous baseline: [`images/Synchronous_test_SummaryReport.png`](images/1st-iteration/Synchronous_test_SummaryReport.png)
 - Event-driven iteration: [`images/2nd-iteration/Summary_Report.jpeg`](images/2nd-iteration/Summary_Report.jpeg)
