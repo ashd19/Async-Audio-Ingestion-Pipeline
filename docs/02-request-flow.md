@@ -102,7 +102,7 @@ See [Authentication](./06-authentication.md).
 Validation is minimal and split between Spring MVC and service code:
 
 - `POST /api/upload` only accepts `multipart/form-data` because of the `@PostMapping` `consumes` declaration in [`FileController`](../AudioPipeline/src/main/java/com/AudioPipeline/controller/FileController.java).
-- `AudioFileService.uploadFile(...)` rejects `null` or empty files with `IllegalArgumentException`.
+- `AudioFileService.uploadFile(...)` rejects `null` or empty files with `IllegalArgumentException`, which `FileController` maps to `400`.
 - `GET /api/files/{objectKey}` rejects blank `objectKey` values in [`AudioFileService.downloadFile(...)`](../AudioPipeline/src/main/java/com/AudioPipeline/service/AudioFileService.java).
 - There is no filename extension whitelist, MIME whitelist, antivirus scan, transcript validation, or upload content validation.
 - DTO validation annotations on [`AudioFileDto`](../AudioPipeline/src/main/java/com/AudioPipeline/dto/AudioFileDto.java) are not applied to requests because this DTO is used as a response model, not a `@RequestBody`.
@@ -192,15 +192,15 @@ sequenceDiagram
     Repo->>DB: SELECT ... FROM audio_processing_jobs
     DB-->>Repo: row or none
     Repo-->>Service: entity or empty
-    Service-->>Controller: AudioJobStatusDto or IllegalArgumentException
-    Controller-->>Client: 200 OK or unhandled server error
+    Service-->>Controller: AudioJobStatusDto or JobNotFoundException
+    Controller-->>Client: 200 OK or 404 Not Found
 ```
 
 Flow:
 
 1. controller calls `audioFileService.getJobStatus(jobId)`
 2. service loads `AudioProcessingJobEntity` via JPA
-3. if missing, `IllegalArgumentException` bubbles up as a 500-style failure because there is no exception mapper
+3. if missing, `JobNotFoundException` (`@ResponseStatus(404)`) yields `404 Not Found`
 4. otherwise response is serialized from `AudioJobStatusDto`
 
 ### `GET /api/audio/{audioId}/transcript`

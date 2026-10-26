@@ -29,7 +29,8 @@ Subfolders:
 - `src/main/resources/`
   - runtime YAML configuration
 - `src/test/java/`
-  - one Spring context smoke test
+  - unit tests for `FileController` (standalone MockMvc), `AudioFileService`, and `AudioEventPublisher` (Mockito), plus an empty smoke test
+  - run with `./AudioPipeline/mvnw -f AudioPipeline/pom.xml test`; no DB, MinIO, or RabbitMQ needed
 - `.mvn/`
   - Maven wrapper metadata
 - `data/`

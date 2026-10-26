@@ -104,7 +104,7 @@ Work:
 
 Why:
 
-- unhandled `IllegalArgumentException` currently leaks as server error behavior
+- only `IllegalArgumentException` (`400`) and `JobNotFoundException` (`404`) are mapped; other errors (MinIO, DB, RabbitMQ) still surface as 500 without a stable error body
 
 Work:
 

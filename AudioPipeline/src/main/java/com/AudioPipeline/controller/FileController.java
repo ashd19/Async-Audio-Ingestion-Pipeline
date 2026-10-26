@@ -42,7 +42,9 @@ public class FileController {
 
     @GetMapping("/files/{*objectKey}")
     public ResponseEntity<InputStreamResource> getFile(@PathVariable String objectKey) throws Exception {
-        AudioFileService.DownloadedFile downloadedFile = audioFileService.downloadFile(objectKey);
+        // {*objectKey} captures the leading slash; MinIO keys don't have one
+        String key = objectKey.startsWith("/") ? objectKey.substring(1) : objectKey;
+        AudioFileService.DownloadedFile downloadedFile = audioFileService.downloadFile(key);
         InputStream stream = downloadedFile.stream();
         String contentType = downloadedFile.contentType();
         MediaType mediaType = contentType != null
@@ -54,6 +56,11 @@ public class FileController {
                 .contentLength(downloadedFile.size())
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + downloadedFile.fileName() + "\"")
                 .body(new InputStreamResource(stream));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleBadRequest(IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 
     @GetMapping("/jobs/{jobId}")
