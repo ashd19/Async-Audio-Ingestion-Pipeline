@@ -88,12 +88,12 @@ Exact values vary. Example shape is based on [`AudioFileDto`](../AudioPipeline/s
 
 #### Failure Modes
 
-- empty file -> `IllegalArgumentException`
+- empty file -> `400 Bad Request` (body: `File is required`)
 - MinIO failures -> exception bubbles up
 - PostgreSQL failures -> exception bubbles up
 - RabbitMQ publish failures -> exception bubbles up
 
-There is no global exception mapping, so failures are not normalized into a stable error contract.
+Only `IllegalArgumentException` (mapped to `400` in `FileController`) and `JobNotFoundException` (`404`) are mapped. Other failures are not normalized into a stable error contract.
 
 ### `GET /api/files/{objectKey}`
 
@@ -111,11 +111,11 @@ Path parameter:
 
 Important caveat:
 
-- because this is a path variable, keys containing `/` will not work cleanly unless routing is adjusted. The service itself expects object keys may contain `/`, and workers generate keys such as `normalized/{audioId}.mp3` and `transcripts/{audioId}.txt`.
+- the route uses `{*objectKey}`, so keys containing `/` work (for example `normalized/{audioId}.mp3`). Spring captures the leading `/`; the controller strips it before the MinIO lookup.
 
 #### Validation
 
-- blank key rejected in service
+- blank key rejected in service (`400 Bad Request`)
 - no authorization checks
 
 #### Response
@@ -189,8 +189,7 @@ Body fields from [`AudioJobStatusDto`](../AudioPipeline/src/main/java/com/AudioP
 
 #### Failure Modes
 
-- missing job throws `IllegalArgumentException("Job not found: ...")`
-- with current code, that propagates as an unhandled server error rather than a clean `404`
+- missing job throws `JobNotFoundException`, annotated `@ResponseStatus(404)`, so the API returns `404 Not Found`
 
 ### `GET /api/audio/{audioId}/transcript`
 

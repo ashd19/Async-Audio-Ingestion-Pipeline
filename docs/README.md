@@ -15,3 +15,6 @@
 - [13 Glossary](./13-glossary.md)
 - [14 Questions](./14-questions.md)
 - [15 Improvements](./15-improvements.md)
+- [16 Learning Path](./16-learning-path.md)
+- [17 Issues](./17-issues.md)
+- [18 Research References](./18-research-references.md)

@@ -132,7 +132,7 @@ Why they are present:
 
 Current effective use:
 
-- only a single `@SpringBootTest` context-load test exists
+- unit tests use JUnit 5, Mockito, AssertJ and MockMvc from the test starters; there are no Spring-context or integration tests
 
 ## Python Dependencies
 

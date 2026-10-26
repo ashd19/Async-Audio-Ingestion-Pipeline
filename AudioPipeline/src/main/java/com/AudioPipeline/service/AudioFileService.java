@@ -5,6 +5,7 @@ import com.AudioPipeline.dto.AudioJobStatusDto;
 import com.AudioPipeline.dto.TranscriptDto;
 import com.AudioPipeline.entity.AudioFilesEntity;
 import com.AudioPipeline.entity.AudioProcessingJobEntity;
+import com.AudioPipeline.exception.JobNotFoundException;
 import com.AudioPipeline.repository.AudioFileRepository;
 import com.AudioPipeline.repository.AudioProcessingJobRepository;
 import com.AudioPipeline.repository.TranscriptRepository;
@@ -142,7 +143,7 @@ public class AudioFileService {
 
     public AudioJobStatusDto getJobStatus(Long jobId) {
         AudioProcessingJobEntity job = jobRepository.findById(jobId)
-                .orElseThrow(() -> new IllegalArgumentException("Job not found: " + jobId));
+                .orElseThrow(() -> new JobNotFoundException(jobId));
 
         return AudioJobStatusDto.builder()
                 .jobId(job.getId())
